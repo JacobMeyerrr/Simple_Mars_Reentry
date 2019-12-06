@@ -10,7 +10,7 @@ function drag = DragForce(rho,Cd,A,v)
 %
 %Inputs:
 %   rho: atmospheric density    [kg/m^3]
-%   Cd: drag coefficient        [kg/m^2]
+%   Cd: drag coefficient        [unitless]
 %   A: cross-sectional area     [m^2]
 %   v: velocity                 [km/s]
 %
