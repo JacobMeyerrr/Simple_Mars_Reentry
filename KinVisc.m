@@ -10,7 +10,7 @@ function nu = KinVisc(temp,rho)
 %   rho: atmospheric density               [kg/m^3]
 %
 %Output:
-%   v: kinematic viscosity                 [m^2/s]
+%   nu: kinematic viscosity                 [m^2/s]
 %
 
 %constants
