@@ -14,4 +14,4 @@ function Cf = BA_SkinFric(Re, M)
 %
 %% Function Main
 
-Cf = (0.65+0.339*((2/pi)*atan(10-M)+1))/sqrt(Re);
+Cf = (0.65+0.339*((2/pi)*atan(10-M)+1))./sqrt(Re);

@@ -1,4 +1,4 @@
-function nu = KinVisc(temp,rho)
+function nu = KinVisc(T,rho)
 
 %KinVisc
 %Usage:
@@ -6,19 +6,21 @@ function nu = KinVisc(temp,rho)
 %   specific temperature and atmospheric density. 
 %
 %Input:
-%   temp: temperature of the atmosphere    [oC]
-%   rho: atmospheric density               [kg/m^3]
+%   T: temperature of the atmosphere    [K]
+%   rho: atmospheric density            [kg/m^3]
 %
 %Output:
-%   nu: kinematic viscosity                 [m^2/s]
+%   v: kinematic viscosity              [m^2/s]
 %
 
 %constants
-B=1.458*10^-6;
-S=110.4;
-T=temp+273.15;
+B=1.458*10^-6;      % [kg/(s*m*K^.5)]
+S=110.4;            % [K]
+
+%Convert degrees Celsius to Kelvin
+T = T + 273.15;     % [K]
 
 %dynamic viscosity
-u=(B*T^1.5)/(T+S);
+u=(B*T.^1.5)./(T+S);
 
-nu=u/rho;
+nu=u./rho;

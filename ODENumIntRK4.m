@@ -43,10 +43,10 @@ for j=1:nt-1
   h = time(j+1)-time(j);
   
   % slope at time point j, or you could say the slope is dx/dt
-  K1 = rhs(time(j),xj,params{1:end});  
-  K2 = rhs(time(j+1)/2,xj + K1 * h/2,params{1:end});
-  K3 = rhs(time(j+1)/2,xj + K2 * h/2,params{1:end});
-  K4 = rhs(time(j+1) ,xj + K3 * h,params{1:end});
+  K1 = rhs(time(j),xj, params{1:end});  
+  K2 = rhs(time(j+1)/2, xj + K1 * h/2,params{1:end});
+  K3 = rhs(time(j+1)/2, xj + K2 * h/2,params{1:end});
+  K4 = rhs(time(j+1) , xj + K3 * h,params{1:end});
   
   K = (K1/6 + K2/3 + K3/3 + K4/6);  
   
@@ -61,7 +61,10 @@ for j=1:nt-1
   xOut(j+1,:) = xNext; 
   % This puts "xNext" (a column vector) into the j+1 row of "xOut".
   % Matlab automatically reshapes it from a column into a row here.
-  
+  if(norm(xOut(j,1:3))-3390 < 5)
+      xOut = xOut(1:j,:);
+      break
+  end
 end
 
 

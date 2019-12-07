@@ -2,7 +2,7 @@ function drag = DragForce(rho,Cd,A,v)
 
 %Drag Force 
 %Calculates the drag force of the spacecraft depending on the current
-%atmospheric density, drag coefficient, cross-sectional area,
+%atmospheric density, ballistic coefficient, mass, cross-sectional area,
 %and velocity.
 %
 %Usage:

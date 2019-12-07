@@ -21,16 +21,19 @@ function temp = Martian_Temp(height)
 
 %% Function Main
 
-h = height * 1000;  % converts height from units of km to units of m.
+h = height;
 
-if h >= 65000
-    T = -167.7;
-    
-elseif h >= 7000
-    T = -23.4 - 0.00222 * h;
+T = zeros(size(h));
 
-else 
-    T = -31 - 0.000998 * h;
-end
+h0_7  = find(h>0 & h< 7);
+h7_65 = find(h>= 7 & h < 65);
+h65p  = find(h > 65);
+
+
+T(h65p)  = -167.7;
+T(h7_65) = -23.4 - 0.00222 * h(h7_65);
+T(h0_7)  = -31 - 0.000998 * h(h0_7);
 
 temp = T;
+
+

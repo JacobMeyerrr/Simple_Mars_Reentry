@@ -14,6 +14,9 @@ function qAvg = BA_HeatRate(rho, v ,Cf)
 %      qAvg:  The body-averaged heating rate for the spacecraft (kg/s^3)
 %
 %% Function Main
+% Convert km/s to m/s
+v = v*1000;
 
-qAvg = 1/4*v^3*Cf;
+% Calculate Body-Averaged Heating Rate
+qAvg = 1/4*rho.*v.^3.*Cf;
 

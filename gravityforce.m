@@ -9,7 +9,7 @@
 %   m = mass of your spacecraft (kg)
 %
 % Outputs:
-%   g = the gravity vector [gx gy gz] of current state (N)
+%   g = the gravity vector [gx gy gz] of current state (m/s/s)
 %
 
 function [g] = gravityforce(r,m)

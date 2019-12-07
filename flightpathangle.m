@@ -2,11 +2,11 @@
 % atmosphere
 %
 % Usage:
-%   [gamma] = flightpathangle(
+%   [gamma] = flightpathangle(r,v)
 %
 % Inputs:
 %   r = radius vector around mars (km)
-%   v = velocity vector around mars (m/s/s)
+%   v = velocity vector around mars (m/s)
 %
 % Outputs:
 %   gamma = the flight path angle between the horizontal and velocity (rad)

@@ -20,5 +20,5 @@ v = v*1000;
 
 %calculate Reynolds Number
 
-Re = v*D/nu;
+Re = v*D./nu;
 

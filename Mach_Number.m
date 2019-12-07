@@ -15,5 +15,8 @@ function M = Mach_Number(v, s)
 %       M: Mach number (unitless) 
 %
 %% Function Main
+% Convert km/s to m/s
+v = v*1000;
 
-M = v/s;
+% Calculate mach #
+M = v./s;
