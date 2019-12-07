@@ -9,8 +9,10 @@ function density = AtmDensityMars(altitude)
 %                         altitude
 %========================================================================%
 %
+%   USAGE:
+%
 % This function takes in an altitude and calculates the density in the
-% Martian atmosphere to output for use in other functions. It evaluates 
+% Martian atmosphere to output for use in other functions. 
 %
 %   INPUTS: 
 %                                                       UNITS:
@@ -28,8 +30,10 @@ end
 if( altitude < 0 )
         error('input altitude must be positive!')
 end
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % input checking to possible add? 
-% if NaN is present, if there is a negative altitude?
+% if NaN is present?
+% NEED TO DOUBLE CHECK THE UNITS
 
 % Initialize h as the altitude value
 h = altitude;
@@ -74,7 +78,7 @@ elseif( 7 < h ) && ( h <= 65 )
     rho = P/(0.1921*(T+273.1));
     
 % If altitude is greater than 65000 meters (upper atmosphere to space)
-elseif( 65 < h )
+elseif( 65 < h ) && ( h < 227920000 )
     
    % Declare coefficents on the polynomial density function
     a0 = 49.8118119899434;
@@ -85,8 +89,15 @@ elseif( 65 < h )
     % Calculate the upper density
     rho = 0.88325*exp(a0+a1*log(h)+a2*(log(h))^2+a3*(log(h))^3);
     
+% If the orbit exceeds the semimajor axis of mars, according to
+% NASA.GOV
+elseif( h > 227920000 )
+    warning("YOU HAVE ESCAPED THE SEMIMAJOR AXIS ORBIT OF MARS!!")
+    
 else(error( "An unknown error occured calculating or from the altitude input"))
+
+end
 
 % Output the density
 density = rho;
-end
+
