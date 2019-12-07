@@ -14,20 +14,24 @@ function density = AtmDensityMars(altitude)
 %
 %   INPUTS: 
 %                                                       UNITS:
-%               h           Altitude                    [Km]
+%               h           Altitude                    [km]
 %
 %   OUTPUTS:
 %
-%               rho         Density found at altitude   [Kg/m^3]
+%               rho         Density found at altitude   [kg/m^3]
 %
 %   INPUT CHECKING:
 
 if( ~isnumeric(altitude) )
     error('input altitude needs to be numeric!')
 end
+if( altitude < 0 )
+        error('input altitude must be positive!')
+end
 % input checking to possible add? 
 % if NaN is present, if there is a negative altitude?
 
+% Initialize h as the altitude value
 h = altitude;
 
 %% Calculate the Density on Mars and the altitude
@@ -81,8 +85,8 @@ elseif( 65 < h )
     % Calculate the upper density
     rho = 0.88325*exp(a0+a1*log(h)+a2*(log(h))^2+a3*(log(h))^3);
     
-else( "An unknown error occured")
-end
+else(error( "An unknown error occured calculating or from the altitude input"))
 
 % Output the density
 density = rho;
+end
