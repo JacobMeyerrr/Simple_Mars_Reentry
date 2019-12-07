@@ -15,6 +15,7 @@ function StateDeriv = CraftOrbit(time, State, Mbody, Mcraft, G)
 %
 %      Mbody: Mass of the parent body. Units: [kg]
 %     Mcraft: Mass of the spacecraft.  Units: [kg]
+%          G: Gravitational constant.  Units: [km^3/(kg*s^2)]
 %
 % OUTPUTS:
 %        StateDeriv = [xDot; yDot; zDot; aX; aY; aZ] 
@@ -41,20 +42,23 @@ V = sqrt(xDot^2+yDot^2+zDot^2);
 
 Vhat = [xDot; yDot; zDot]/V;
 
-%Forces
-Fg = -G*Mbody*Mcraft/(R*1000)^2;   %(N)
+%Calculate density
+rho = AtmDensityMars(R-3390);
 
-Fd = 0;
+%Forces
+Fg = gravityforce([x;y;z],Mcraft);  %(N)
+
+Fd = DragForce(rho,10.5,20,V);
 
 %Acceleration
-ax = (Fg*Rhat(1)/1000) ...
-             + (Fd*-Vhat(1));       %kg*km/s^2
+ax = (Fg(1)/(Mcraft*1000)) ...
+             + (Fd*-Vhat(1)/(Mcraft*1000));       %km/s^2
             
-ay = (Fg*Rhat(2)/1000) ...
-             + (Fd*-Vhat(2));       %kg*km/s^2
+ay = (Fg(2)/(Mcraft*1000)) ...
+             + (Fd*-Vhat(2)/(Mcraft*1000));       %km/s^2
             
-az = (Fg*Rhat(3)/1000) ...
-             + (Fd*-Vhat(3));       %kg*km/s^2
+az = (Fg(3)/(Mcraft*1000)) ...
+             + (Fd*-Vhat(3)/(Mcraft*1000));       %km/s^2
             
 
 StateDeriv = [xDot; yDot; zDot; ax; ay; az];
