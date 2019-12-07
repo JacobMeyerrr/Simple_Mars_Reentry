@@ -28,14 +28,16 @@ end
 % input checking to possible add? 
 % if NaN is present, if there is a negative altitude?
 
-%% Convert the altitude to meters
-h = altitude * 1000;
+h = altitude;
 
 %% Calculate the Density on Mars and the altitude
 
-% If altitude is less then 7000 meters (surface to mid-atmosphere)
-if( 0 <= h ) && ( h <= 7000)
+% If altitude is less then 7km (7000m) (surface to mid-atmosphere)
+if( 0 <= h ) && ( h <= 7)
     
+    % Convert the altitude to meters
+    h = altitude * 1000;
+
     % Calculate the pressure
     % P = pressure (kPa)
     P = 0.699*exp(-0.00009*h);
@@ -48,9 +50,12 @@ if( 0 <= h ) && ( h <= 7000)
     % NOTE: temp is in degree celsius but gets converted to kelvin here
     rho = P/(0.1921*(T+273.1));
     
-%If altitude is greater than 7000 meters and less than or equal to
+%If altitude is greater than 7 km (7000 meters) and less than or equal to
 %65000 meters (mid-atmosphere to upper atmosphere)
-elseif( 7000 < h ) && ( h <= 65000 )
+elseif( 7 < h ) && ( h <= 65 )
+    
+    % Convert the altitude to meters
+    h = altitude * 1000;
     
     % Calculate the pressure
     % P = pressure (kPa)
@@ -65,7 +70,7 @@ elseif( 7000 < h ) && ( h <= 65000 )
     rho = P/(0.1921*(T+273.1));
     
 % If altitude is greater than 65000 meters (upper atmosphere to space)
-elseif( 65000 < h )
+elseif( 65 < h )
     
    % Declare coefficents on the polynomial density function
     a0 = 49.8118119899434;
