@@ -70,7 +70,7 @@ Vnew = u*deltaV*vHat;           % New Velocity vector after DeltaV impulse
 
 orbit(end,4:6) = Vnew;          % Orbit(end,:) is our new state vector
 
-time2 = linspace(0,1e6,2e6);   % Define new time vector
+time2 = linspace(0,1e6,1e6);   % Define new time vector
 
 % Simulate spacecraft reentry into Mars atmosphere
 reentry = ODENumIntRK4(@CraftOrbit,time2,orbit(end,:),Mass_craft);
@@ -78,6 +78,9 @@ reentry = ODENumIntRK4(@CraftOrbit,time2,orbit(end,:),Mass_craft);
 orbit_Tot = [orbit;reentry];
 
 figure(i), hold on, grid on
+[x,y,z] = sphere(50);
+surf(x*Radius_Mars,y*Radius_Mars,z*Radius_Mars,'FaceColor', ...
+    [1 0 0],'edgecolor', 'none')
 plot3(orbit_Tot(:,1),orbit_Tot(:,2),orbit_Tot(:,3),'b-')
 xlabel('distance (km)'),ylabel('distance (km)'),zlabel('distance (km)')
 
@@ -100,7 +103,7 @@ elapsed_time(i) = T*NumOrbs + time2(length(reentry));
 
 end
 
-DV = DV*V0 - V0
+DV = DV*V0 - V0;
 
 figure(11) , hold on
 leg = legend([num2str(DV(1))], [num2str(DV(2))],[num2str(DV(3))],...
@@ -111,13 +114,13 @@ title(leg,"deltaV (km/s)")
 
 format short
 t = table(DV(:),elapsed_time(:),vfinal(:),gamma_final(:),maxQ(:), alt_MaxQ(:));
-t.Properties.VariableNames = {'DeltaV','Duration','Final_Velocity',...
-    'Flight_Path_Angle','Max_Heating_Rate', 'Altitude_MHR'};
-t
+t.Properties.VariableNames = {'DeltaV','Duration',...
+    'Final_Velocity', 'Flight_Path_Angle', ...
+    'Max_Heating_Rate', 'Altitude_MHR'};
 
-% figure(12)
-% uitable('Data',T{:,:},'ColumnName',T.Properties.VariableNames,...
-%     'RowName',T.Properties.RowNames,'Units', 'Normalized', 'Position',[0, 0, 1, 1]);
+figure(12)
+uitable('Data',t{:,:},'ColumnName',t.Properties.VariableNames,...
+        'Units','Normalized', 'Position',[0, 0, 1, 1],'FontSize',12);
 
 
 
