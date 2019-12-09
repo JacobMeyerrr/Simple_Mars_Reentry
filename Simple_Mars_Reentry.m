@@ -26,17 +26,18 @@ V0 = sqrt(G*(Mass_Mars+Mass_craft) ...
               /Altitude)+0.0073062;     %[km/s]
 
 %Define initial state vector and time vector
-
+vHat     = [0;1/sqrt(2);1/sqrt(2)];
 PosState = [Altitude;0;0];              %[x;y;z]   [km;km;km]
-VelState = [0;V0;0];                    %[Vx;Vy;Vz][km/s;km/s;km/s]
+VelState = V0*vHat;                     %[Vx;Vy;Vz][km/s;km/s;km/s]
 
 state0 = [PosState; VelState];
 
 
 T = sqrt(4*pi^2*(norm(PosState))^3 ...
                     /(G*Mass_Mars));    %calculating the orbital period
+                
 NumOrbs = 3;                            %approximate number of orbits
-time1 = linspace(0,T*NumOrbs,1e6);      % [s]
+time1 = linspace(0,T*NumOrbs,5e5);      % [s]
 
 %Pre allocate arrays sizes
 maxQ         = zeros(1,10);
@@ -48,6 +49,9 @@ elapsed_time = zeros(1,10);
 
 %DeltaV's to be tested
 DV = linspace(0.9956,0.5,10);
+
+
+%plotting surface of mars
 
 
 for i = 1:10
@@ -66,21 +70,16 @@ Vnew = u*deltaV*vHat;           % New Velocity vector after DeltaV impulse
 
 orbit(end,4:6) = Vnew;          % Orbit(end,:) is our new state vector
 
-time2 = linspace(0,1e6,10e6);   % Define new time vector
+time2 = linspace(0,1e6,2e6);   % Define new time vector
 
 % Simulate spacecraft reentry into Mars atmosphere
 reentry = ODENumIntRK4(@CraftOrbit,time2,orbit(end,:),Mass_craft);
 
 orbit_Tot = [orbit;reentry];
 
-x = [-3390:1e9:3390];
-y = sqrt(3390^2 - x.^2);
-
 figure(i), hold on, grid on
-pbaspect([1 1 1])
-plot(x,y,'r-')
-plot(x,-y,'r-')
-plot(orbit_Tot(:,1),orbit_Tot(:,2))
+plot3(orbit_Tot(:,1),orbit_Tot(:,2),orbit_Tot(:,3),'b-')
+xlabel('distance (km)'),ylabel('distance (km)'),zlabel('distance (km)')
 
 %Calculate Body-Averaged HeatingRate
 qAvg = HeatingRate(orbit_Tot);
@@ -97,7 +96,7 @@ alt_MaxQ(i) = R(find(qAvg == maxQ(i)));
 % Record Final Velocity, Flight Path Angle (Gamma), and time elapsed
 vfinal(i) = norm(orbit_Tot(end,4:6));
 gamma_final(i) = flightpathangle(orbit_Tot(end,1:3),orbit_Tot(end,4:6));
-elapsed_time(i) = T*NumOrbs + time2(length(orbit_Tot(:,1)))*10;
+elapsed_time(i) = T*NumOrbs + time2(length(reentry));
 
 end
 
