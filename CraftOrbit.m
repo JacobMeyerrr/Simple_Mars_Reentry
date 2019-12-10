@@ -1,4 +1,4 @@
-function [StateDeriv,qAvg] = CraftOrbit(time, State, Mcraft)
+function [StateDeriv,qAvg] = CraftOrbit(time, State, Mcraft,Drag0_1)
 %% Craft Orbit
 %  Calculate the orbital parameters of the spacecraft in orbit of the
 %  parent body
@@ -14,7 +14,7 @@ function [StateDeriv,qAvg] = CraftOrbit(time, State, Mcraft)
 %             [x; y; z; Vx; Vy; Vz] - Units: [m; m; m; m/s; m/s; m/s]
 %
 %     Mcraft: Mass of the spacecraft.  Units: [kg]
-%          G: Gravitational constant.  Units: [km^3/(kg*s^2)]
+%    Drag0_1: Boolean input to turn drag on/off (true = on)
 %
 % OUTPUTS:
 %        StateDeriv = [xDot; yDot; zDot; aX; aY; aZ] 
@@ -42,11 +42,15 @@ Vhat = [xDot; yDot; zDot]/V;
 %Calculate density
 rho = AtmDensityMars(R-3390);
 
-%Forces
+% Calculate Gravitational Force
 Fg = gravityforce([x;y;z],Mcraft);  %(N)
 
-Fd = DragForce(rho,10.4,20,V);
-
+% Calculate Drag Force
+if(Drag0_1)
+    Fd = DragForce(rho,10.4,20,V);
+else
+    Fd = 0;
+end
 %Acceleration
 ax = (Fg(1)/(Mcraft*1000)) ...
              + (Fd*-Vhat(1)/(Mcraft*1000));       %km/s^2

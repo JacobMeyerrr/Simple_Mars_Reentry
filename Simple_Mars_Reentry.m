@@ -39,6 +39,45 @@ T = sqrt(4*pi^2*(norm(PosState))^3 ...
 NumOrbs = 3;                            %approximate number of orbits
 time1 = linspace(0,T*NumOrbs,5e5);      % [s]
 
+%% Calculating the deltaV required to induce reentry
+% Define a desired periapsis that will induce a reentry.
+% run simulation with varying deltaV's and a zero drag force model
+% measuring the periapsis.
+% exit simulation when the desired periapsis is achieved
+%
+
+dv = linspace(1,0,500);     %percent of circular orbital velocity (V0)
+entry = 50;                 %Desired periapsis [km]
+
+for i = 1:length(dv)
+
+    V = V0*dv(i);
+
+    vHat     = [0;1;0];
+    PosState = [Altitude;0;0];              %[x;y;z]   [km;km;km]
+    VelState = V*vHat;                      %[Vx;Vy;Vz][km/s;km/s;km/s]
+
+    state0 = [PosState; VelState];          %initial state vector
+
+    orbit = ODENumIntRK4(@CraftOrbit,time1,state0,Mass_craft,false);
+
+    R = vecnorm(orbit(:,1:3),2,2)-Radius_Mars;
+
+    periapsis = min(R)
+
+    if(periapsis <= entry)
+        initalDV = dv(i);
+        break;
+    end
+end
+
+
+%% Simulate reentry into Martian atmosphere
+
+%Redefine state vector
+VelState = [0;V0;0];
+State0   = [PosState;VelState];
+
 %Pre allocate arrays sizes
 maxQ         = zeros(1,10);
 alt_MaxQ     = zeros(1,10);
@@ -48,16 +87,13 @@ elapsed_time = zeros(1,10);
 
 
 %DeltaV's to be tested
-DV = linspace(0.9956,0.5,10);
-
-
-%plotting surface of mars
+DV = linspace(initalDV,initalDV/1.5,10);
 
 
 for i = 1:10
 
 % Calculating orbit using numerical integration
-orbit = ODENumIntRK4(@CraftOrbit,time1,state0,Mass_craft);
+orbit = ODENumIntRK4(@CraftOrbit,time1,state0,Mass_craft,true);
 
 % Initialize deorbit burn
 v = orbit(end,4:6);             % current velocity state
