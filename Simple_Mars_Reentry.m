@@ -15,18 +15,17 @@ Mass_Mars   = 6.39e23;                  %[kg]
 
 % Spacecraft Constants
 Mass_craft = 10400;                     %[kg]
-Diameter   = 5.05;                      %[m]
 
 % Gravitational Constant
 G          = (6.67408e-11)/1000^3;      %[km^3/(kg*s^2)]
 
 % Initial conditions
 Altitude = Radius_Mars + 200;           %[km]
-V0 = sqrt(G*(Mass_Mars+Mass_craft) ... 
+V0 = sqrt(G*(Mass_Mars + Mass_craft) ... 
               /Altitude)+0.0073062;     %[km/s]
 
 %Define initial state vector and time vector
-vHat     = [0;1/sqrt(2);1/sqrt(2)];
+vHat     = [0;1;0];
 PosState = [Altitude;0;0];              %[x;y;z]   [km;km;km]
 VelState = V0*vHat;                     %[Vx;Vy;Vz][km/s;km/s;km/s]
 
@@ -46,8 +45,9 @@ time1 = linspace(0,T*NumOrbs,5e5);      % [s]
 % exit simulation when the desired periapsis is achieved
 %
 
-dv = linspace(1,0,500);     %percent of circular orbital velocity (V0)
-entry = 50;                 %Desired periapsis [km]
+dv = linspace(1,0.5,250);     %percent of circular orbital velocity (V0)
+entry = 50;                   %Desired periapsis [km]
+enters = 0;
 
 for i = 1:length(dv)
 
@@ -63,20 +63,34 @@ for i = 1:length(dv)
 
     R = vecnorm(orbit(:,1:3),2,2)-Radius_Mars;
 
-    periapsis = min(R)
+    periapsis = min(R);
 
     if(periapsis <= entry)
-        initalDV = dv(i);
+        initialDV = dv(i);
         break;
+    end
+    
+    if(periapsis <= entry*1.2 && enters == 0)
+        dv = linspace(dv(i),dv(i)/2,1e4);
+        i=1;
+        enters = 1;
     end
 end
 
 
 %% Simulate reentry into Martian atmosphere
 
-%Redefine state vector
-VelState = [0;V0;0];
-State0   = [PosState;VelState];
+% Initial conditions
+Altitude = Radius_Mars + 200;           %[km]
+V0 = sqrt(G*(Mass_Mars+Mass_craft) ... 
+              /Altitude)+0.0073062;     %[km/s]
+
+%Define initial state vector and time vector
+vHat     = [0;1;0];
+PosState = [Altitude;0;0];              %[x;y;z]   [km;km;km]
+VelState = V0*vHat;                     %[Vx;Vy;Vz][km/s;km/s;km/s]
+
+state0 = [PosState; VelState];
 
 %Pre allocate arrays sizes
 maxQ         = zeros(1,10);
@@ -87,7 +101,7 @@ elapsed_time = zeros(1,10);
 
 
 %DeltaV's to be tested
-DV = linspace(initalDV,initalDV/1.5,10);
+DV = linspace(initialDV, initialDV/2,10);
 
 
 for i = 1:10
@@ -109,7 +123,7 @@ orbit(end,4:6) = Vnew;          % Orbit(end,:) is our new state vector
 time2 = linspace(0,1e6,1e6);   % Define new time vector
 
 % Simulate spacecraft reentry into Mars atmosphere
-reentry = ODENumIntRK4(@CraftOrbit,time2,orbit(end,:),Mass_craft);
+reentry = ODENumIntRK4(@CraftOrbit,time2,orbit(end,:),Mass_craft,true);
 
 orbit_Tot = [orbit;reentry];
 
@@ -145,7 +159,7 @@ figure(11) , hold on
 leg = legend([num2str(DV(1))], [num2str(DV(2))],[num2str(DV(3))],...
         [num2str(DV(4))],[num2str(DV(5))],[num2str(DV(6))],...
         [num2str(DV(7))],[num2str(DV(8))],[num2str(DV(9))],...
-        [num2str(DV(10))]);
+        [num2str(DV(10))],'location','eastoutside');
 title(leg,"deltaV (km/s)") 
 
 format short

@@ -3,7 +3,7 @@ function xOut = ODENumIntRK4(rhs,time,x0,varargin)
 % Implement the Euler method to numerically integrate ODEs.
 % 
 % Usage:
-%   xOut = ODENumIntEuler(rhs,time,x0)
+%   xOut = ODENumIntRK4(rhs,time,x0)
 %
 % Inputs:
 %   rhs     Function handle for the "right hand side" dynamic equations.

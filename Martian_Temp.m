@@ -14,10 +14,11 @@ function temp = Martian_Temp(height)
 %
 % INPUTS:
 %       height: altitude above msl of Mars  (km)
+%               can be a vector of heights, or a scalar value.
 %
 % OUTPUTS:
 %       temp:   atmospheric temperature at given altitude  (degrees C)
-%
+%               will be a vector or a scalar depending on input
 
 %% Function Main
 

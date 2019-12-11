@@ -1,4 +1,4 @@
-function [StateDeriv,qAvg] = CraftOrbit(time, State, Mcraft,Drag0_1)
+function [StateDeriv] = CraftOrbit(time, State, Mcraft, Drag0_1)
 %% Craft Orbit
 %  Calculate the orbital parameters of the spacecraft in orbit of the
 %  parent body
@@ -51,7 +51,8 @@ if(Drag0_1)
 else
     Fd = 0;
 end
-%Acceleration
+
+% Calculate Acceleration components
 ax = (Fg(1)/(Mcraft*1000)) ...
              + (Fd*-Vhat(1)/(Mcraft*1000));       %km/s^2
             

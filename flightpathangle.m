@@ -29,4 +29,6 @@ alpha = acos(d);
 % flight path angle
 gamma = pi/2 - alpha;
 
+gamma = gamma*180/pi;
+
 end
