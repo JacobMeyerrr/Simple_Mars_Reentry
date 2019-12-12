@@ -24,17 +24,12 @@ Altitude = Radius_Mars + 200;           %[km]
 V0 = sqrt(G*(Mass_Mars + Mass_craft) ... 
               /Altitude)+0.0073062;     %[km/s]
 
-%Define initial state vector and time vector
-vHat     = [0;1/sqrt(2);1/sqrt(2)];
-PosState = [Altitude;0;0];              %[x;y;z]   [km;km;km]
-VelState = V0*vHat;                     %[Vx;Vy;Vz][km/s;km/s;km/s]
 
-state0 = [PosState; VelState];
-
-
+% Calculating the orbital period for a circular orbit
 T = sqrt(4*pi^2*(norm(PosState))^3 ...
                     /(G*Mass_Mars));    %calculating the orbital period
                 
+% Defining a time vector
 NumOrbs = 3;                            %approximate number of orbits
 time1 = linspace(0,T*NumOrbs,5e5);      % [s]
 
@@ -66,6 +61,12 @@ for i = 1:length(dv)
     periapsis = min(R);
 
     if(periapsis <= entry)
+        x = ones(size(R))*entry;
+        figure(1), hold on
+        plot(time1,x,'r-'),plot(time1,R,'b-')
+        title("Orbital Altitude vs. Time")
+        xlabel("time (s)"),ylabel("Altitude (km)")
+        legend("Target Periapsis","Orbital Altitude")
         initialDV = dv(i);
         break;
     end
@@ -86,7 +87,7 @@ V0 = sqrt(G*(Mass_Mars+Mass_craft) ...
               /Altitude)+0.0073062;     %[km/s]
 
 %Define initial state vector and time vector
-vHat     = [0;1/sqrt(2);1/sqrt(2)];
+vHat     = [0;1/sqrt(2);1/sqrt(2)];     %initial velocity unit vector
 PosState = [Altitude;0;0];              %[x;y;z]   [km;km;km]
 VelState = V0*vHat;                     %[Vx;Vy;Vz][km/s;km/s;km/s]
 
@@ -127,11 +128,12 @@ reentry = ODENumIntRK4(@CraftOrbit,time2,orbit(end,:),Mass_craft,true);
 
 orbit_Tot = [orbit;reentry];
 
-figure(i), hold on, grid on
+figure(i+1), hold on, grid on
 [x,y,z] = sphere(50);
 surf(x*Radius_Mars,y*Radius_Mars,z*Radius_Mars,'FaceColor', ...
     [1 0 0],'edgecolor', 'none')
 plot3(orbit_Tot(:,1),orbit_Tot(:,2),orbit_Tot(:,3),'b-')
+title("Orbital Trajectory around Mars")
 xlabel('distance (km)'),ylabel('distance (km)'),zlabel('distance (km)')
 
 %Calculate Body-Averaged HeatingRate
@@ -139,7 +141,7 @@ qAvg = HeatingRate(orbit_Tot);
 
 R = vecnorm(orbit_Tot(:,1:3),2,2)-Radius_Mars;
 
-figure(11), grid on, hold on
+figure(12), grid on, hold on
 plot(R,qAvg)
 
 % Calculate Max Heating Rate, and Alt where it occurs
@@ -155,13 +157,14 @@ end
 
 DV = DV*V0 - V0;
 
-figure(11) , hold on
+figure(12) , hold on
 leg = legend([num2str(DV(1))], [num2str(DV(2))],[num2str(DV(3))],...
         [num2str(DV(4))],[num2str(DV(5))],[num2str(DV(6))],...
         [num2str(DV(7))],[num2str(DV(8))],[num2str(DV(9))],...
         [num2str(DV(10))],'location','eastoutside');
 title(leg,"deltaV (km/s)") 
-xlabel('distance (km)'),ylabel('heating rate (kg/s^3)')
+title("Heating Rate vs. Altitude")
+xlabel('Altitude (km)'),ylabel('heating rate (kg/s^3)')
 
 format short
 t1 = table(DV(:),elapsed_time(:),vfinal(:));
@@ -171,15 +174,19 @@ t2 = table(gamma_final(:),maxQ(:), alt_MaxQ(:));
 t2.Properties.VariableNames = {'Flight_Path_Angle', 'Max_Heating_Rate',...
         'Altitude_MHR'};
     
-figure(12)
+figure(13)
 uitable('Data',t1{:,:},'ColumnName',t1.Properties.VariableNames,...
         'Units','Normalized', 'Position',[0, 0, 1, 1],'FontSize',12);
     
-figure(13)
+figure(14)
 uitable('Data',t2{:,:},'ColumnName',t2.Properties.VariableNames,...
         'Units','Normalized', 'Position',[0, 0, 1, 1],'FontSize',12);
 
-
+figure(15)
+plot(DV,maxQ,'r.','markersize',10)
+title("Max Heating Rate vs. deltaV")
+xlabel("deltaV (km/s)"),ylabel("Max Heating Rate (kg/s^3)")
+grid on, grid minor
 
 
 
