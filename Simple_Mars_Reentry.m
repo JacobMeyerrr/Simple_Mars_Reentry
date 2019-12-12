@@ -25,7 +25,7 @@ V0 = sqrt(G*(Mass_Mars + Mass_craft) ...
               /Altitude)+0.0073062;     %[km/s]
 
 %Define initial state vector and time vector
-vHat     = [0;1;0];
+vHat     = [0;1/sqrt(2);1/sqrt(2)];
 PosState = [Altitude;0;0];              %[x;y;z]   [km;km;km]
 VelState = V0*vHat;                     %[Vx;Vy;Vz][km/s;km/s;km/s]
 
@@ -53,7 +53,7 @@ for i = 1:length(dv)
 
     V = V0*dv(i);
 
-    vHat     = [0;1;0];
+    vHat     = [0;1/sqrt(2);1/sqrt(2)];
     PosState = [Altitude;0;0];              %[x;y;z]   [km;km;km]
     VelState = V*vHat;                      %[Vx;Vy;Vz][km/s;km/s;km/s]
 
@@ -86,7 +86,7 @@ V0 = sqrt(G*(Mass_Mars+Mass_craft) ...
               /Altitude)+0.0073062;     %[km/s]
 
 %Define initial state vector and time vector
-vHat     = [0;1;0];
+vHat     = [0;1/sqrt(2);1/sqrt(2)];
 PosState = [Altitude;0;0];              %[x;y;z]   [km;km;km]
 VelState = V0*vHat;                     %[Vx;Vy;Vz][km/s;km/s;km/s]
 
@@ -161,18 +161,23 @@ leg = legend([num2str(DV(1))], [num2str(DV(2))],[num2str(DV(3))],...
         [num2str(DV(7))],[num2str(DV(8))],[num2str(DV(9))],...
         [num2str(DV(10))],'location','eastoutside');
 title(leg,"deltaV (km/s)") 
+xlabel('distance (km)'),ylabel('heating rate (kg/s^3)')
 
 format short
-t = table(DV(:),elapsed_time(:),vfinal(:),gamma_final(:),maxQ(:), alt_MaxQ(:));
-t.Properties.VariableNames = {'DeltaV','Duration',...
-    'Final_Velocity', 'Flight_Path_Angle', ...
-    'Max_Heating_Rate', 'Altitude_MHR'};
+t1 = table(DV(:),elapsed_time(:),vfinal(:));
+t1.Properties.VariableNames = {'DeltaV', 'Duration', 'Final_Velocity'};
 
+t2 = table(gamma_final(:),maxQ(:), alt_MaxQ(:));
+t2.Properties.VariableNames = {'Flight_Path_Angle', 'Max_Heating_Rate',...
+        'Altitude_MHR'};
+    
 figure(12)
-uitable('Data',t{:,:},'ColumnName',t.Properties.VariableNames,...
+uitable('Data',t1{:,:},'ColumnName',t1.Properties.VariableNames,...
         'Units','Normalized', 'Position',[0, 0, 1, 1],'FontSize',12);
-
-
+    
+figure(13)
+uitable('Data',t2{:,:},'ColumnName',t2.Properties.VariableNames,...
+        'Units','Normalized', 'Position',[0, 0, 1, 1],'FontSize',12);
 
 
 

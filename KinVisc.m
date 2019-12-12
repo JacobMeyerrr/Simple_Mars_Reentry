@@ -13,14 +13,15 @@ function nu = KinVisc(T,rho)
 %   v: kinematic viscosity              [m^2/s]
 %
 
-%constants
+%constants in Sutherland equation
 B=1.458*10^-6;      % [kg/(s*m*K^.5)]
 S=110.4;            % [K]
 
 %Convert degrees Celsius to Kelvin
 T = T + 273.15;     % [K]
 
-%dynamic viscosity
+%dynamic viscosity calculated via the Sutherland equation
 u=(B*T.^1.5)./(T+S);
 
+%calculate kinematic viscosity
 nu=u./rho;
