@@ -1,11 +1,11 @@
 
 %% Mars Orbital Reentry Simulation
-% Simulate the orbital path around Mars for the Nasa Orion capsual.
-% Implement deorbit mavuever and simulate entry into the Martian atmosphere
-% and terminate the simulation at 5km.
+%Simulate the orbital path around Mars for the Nasa Orion capsual.
+%Implement deorbit mavuever and simulate entry into the Martian atmosphere
+%and terminate the simulation at 5km.
 %
-% Calculate the Body-Averaged heat rate during reentry
-% Calculate the final velocity, flightpath angle, and elapsed time.
+%Calculate the Body-Averaged heat rate during reentry
+%Calculate the final velocity, flightpath angle, and elapsed time.
 %
 
 %% Defining Constants
@@ -34,11 +34,12 @@ T = sqrt(4*pi^2*(Altitude)^3 ...
 NumOrbs = 3;                            %approximate number of orbits
 time1 = linspace(0,T*NumOrbs,5e5);      %[s]
 
-%% Calculating deltaV required to induce reentry
-% Define a desired periapsis that will induce a reentry.
-% run simulation with varying deltaV's and a zero drag force model
-% measuring the periapsis.
-% exit simulation when the desired periapsis is achieved
+%% Calculate Initial De-orbit Burn
+%Calculating velocity reduction(deltaV) required to induce reentry
+%Define a desired periapsis that will induce a reentry.
+%run simulation with varying deltaV's and a zero drag force model
+%measuring the periapsis.
+%exit simulation when the desired periapsis is achieved
 %
 
 dv = linspace(1,0.5,250);                 %Vector defining percent V0
@@ -63,7 +64,7 @@ for i = 1:length(dv)
     periapsis = min(R);
     
     %If the periapsis of the previous iteration meets the desired value -
-    %print the altitude vs. time to verify and break the loop.
+    %plot the altitude vs. time to verify and break the loop.
     if(periapsis <= entry)
         x = ones(size(R))*entry;
         figure(1), hold on
@@ -114,7 +115,7 @@ DV = linspace(initialDV, initialDV/2,10);
 
 for i = 1:10
 
-% Calculate initial parking orbit using numerical integration
+%Calculate initial parking orbit using numerical integration
 orbit = ODENumIntRK4(@CraftOrbit,time1,state0,Mass_craft,true);
 
 %Initialize deorbit burn
@@ -136,13 +137,15 @@ reentry = ODENumIntRK4(@CraftOrbit,time2,orbit(end,:),Mass_craft,true);
 orbit_Tot = [orbit;reentry];    % Matrix of states for entire duration
 
 %Plotting the orbital path around Mars
-figure(i+1), hold on, grid on
+figure(2*i), hold on, grid on
 [x,y,z] = sphere(50);
 surf(x*Radius_Mars,y*Radius_Mars,z*Radius_Mars,'FaceColor', ...
     [1 0 0],'edgecolor', 'none')
 plot3(orbit_Tot(:,1),orbit_Tot(:,2),orbit_Tot(:,3),'b-')
 title("Orbital Trajectory around Mars")
 xlabel('distance (km)'),ylabel('distance (km)'),zlabel('distance (km)')
+
+
 
 %Calculate Body-Averaged HeatingRate
 qAvg = HeatingRate(orbit_Tot);
@@ -160,11 +163,19 @@ alt_MaxQ(i) = R(find(qAvg == maxQ(i)));
 %Record Final Velocity, Flight Path Angle (Gamma), and time elapsed
 vfinal(i) = norm(orbit_Tot(end,4:6));
 gamma_final(i) = flightpathangle(orbit_Tot(end,1:3),orbit_Tot(end,4:6));
-elapsed_time(i) = T*NumOrbs + time2(length(reentry))/3600;
+elapsed_time(i) = (T*NumOrbs + time2(length(reentry)))/3600;
+
+%Plotting orbital height over time
+figure(3*i)
+plot(elapsed_time(i),R,'b-')
+xlabel('time (s)'), ylabel('Altitude (km)')
+title('Orbital Height during entry')
 
 end
 
-% Calculating the deltaV used to induce reentry
+%% Data Analysis
+
+%Calculating the deltaV used to induce reentry
 DV = DV*V0 - V0;
 
 %Formatting the figure for Heating rate vs. Altitude. 
@@ -182,18 +193,14 @@ xlabel('Altitude (km)'),ylabel('heating rate (kg/s^3)')
 format short
 t1 = table(DV(:),elapsed_time(:),vfinal(:));
 t1.Properties.VariableNames = {'DeltaV', 'Duration', 'Final_Velocity'};
+disp(t1),disp(["       km/s        hrs            km/s"])
 
 t2 = table(gamma_final(:),maxQ(:), alt_MaxQ(:));
 t2.Properties.VariableNames = {'Flight_Path_Angle', 'Max_Heating_Rate',...
         'Altitude_MHR'};
     
-figure(13)
-uitable('Data',t1{:,:},'ColumnName',t1.Properties.VariableNames,...
-        'Units','Normalized', 'Position',[0, 0, 1, 1],'FontSize',13);
+disp(t2),disp(["       degrees                kg/s^3              km"])
     
-figure(14)
-uitable('Data',t2{:,:},'ColumnName',t2.Properties.VariableNames,...
-        'Units','Normalized', 'Position',[0, 0, 1, 1],'FontSize',13);
 
 %Plotting max heating rate vs. deltaV used.
 figure(15)
@@ -201,6 +208,15 @@ plot(DV,maxQ,'r.','markersize',10)
 title("Max Heating Rate vs. deltaV")
 xlabel("deltaV (km/s)"),ylabel("Max Heating Rate (kg/s^3)")
 grid on, grid minor
+
+
+%Table of analyzed data from Martian entry profiles
+%DeltaV: Orbital Velocity Reduction to induce atmospheric entry (km/s)
+%Duration: Time from start of simulation to end (hrs)
+%Final_Velocity: Craft velocity at termination of simulation
+%Flight_Path_Angle: Flight path angle of craft at termination
+%Max_Heating_Rate: The max heating rate for flight profile
+%Altitude_MHR: Altitude at which max heating rate occured.
 
 
 
