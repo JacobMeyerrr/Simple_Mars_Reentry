@@ -137,7 +137,7 @@ reentry = ODENumIntRK4(@CraftOrbit,time2,orbit(end,:),Mass_craft,true);
 orbit_Tot = [orbit;reentry];    % Matrix of states for entire duration
 
 %Plotting the orbital path around Mars
-figure(2*i), hold on, grid on
+figure(i+1), hold on, grid on
 [x,y,z] = sphere(50);
 surf(x*Radius_Mars,y*Radius_Mars,z*Radius_Mars,'FaceColor', ...
     [1 0 0],'edgecolor', 'none')
@@ -165,11 +165,13 @@ vfinal(i) = norm(orbit_Tot(end,4:6));
 gamma_final(i) = flightpathangle(orbit_Tot(end,1:3),orbit_Tot(end,4:6));
 elapsed_time(i) = (T*NumOrbs + time2(length(reentry)))/3600;
 
-%Plotting orbital height over time
-figure(3*i)
-plot(elapsed_time(i),R,'b-')
-xlabel('time (s)'), ylabel('Altitude (km)')
-title('Orbital Height during entry')
+%Plotting orbital height over time during reentry
+time = time2(1,1:length(reentry));
+alt  = R(length(orbit)+1:length(orbit)+length(reentry),1);
+
+figure(13), hold on, grid on
+plot(time,alt)
+
 
 end
 
@@ -180,13 +182,23 @@ DV = DV*V0 - V0;
 
 %Formatting the figure for Heating rate vs. Altitude. 
 figure(12) , hold on
-leg = legend([num2str(DV(1))], [num2str(DV(2))],[num2str(DV(3))],...
-        [num2str(DV(4))],[num2str(DV(5))],[num2str(DV(6))],...
-        [num2str(DV(7))],[num2str(DV(8))],[num2str(DV(9))],...
-        [num2str(DV(10))],'location','eastoutside');
+leg = legend(num2str(DV(1)), num2str(DV(2)),num2str(DV(3)),...
+        num2str(DV(4)),num2str(DV(5)),num2str(DV(6)),...
+        num2str(DV(7)),num2str(DV(8)),num2str(DV(9)),...
+        num2str(DV(10)),'location','eastoutside');
 title(leg,"deltaV (km/s)") 
 title("Heating Rate vs. Altitude")
 xlabel('Altitude (km)'),ylabel('heating rate (kg/s^3)')
+
+figure(13) , hold on
+leg = legend(num2str(DV(1)), num2str(DV(2)),num2str(DV(3)),...
+        num2str(DV(4)),num2str(DV(5)),num2str(DV(6)),...
+        num2str(DV(7)),num2str(DV(8)),num2str(DV(9)),...
+        num2str(DV(10)),'location','eastoutside');
+title(leg,"deltaV (km/s)") 
+title("Heating Rate vs. Altitude")
+xlabel('time (s)'), ylabel('Altitude (km)')
+title('Orbital Height during entry')
 
 
 %Building tables of final data to display
@@ -203,7 +215,7 @@ disp(t2),disp(["       degrees                kg/s^3              km"])
     
 
 %Plotting max heating rate vs. deltaV used.
-figure(15)
+figure(14)
 plot(DV,maxQ,'r.','markersize',10)
 title("Max Heating Rate vs. deltaV")
 xlabel("deltaV (km/s)"),ylabel("Max Heating Rate (kg/s^3)")
